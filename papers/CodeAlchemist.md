@@ -59,7 +59,7 @@ postcondition：描述在该 code brick 有哪些变量可用
 
 ### CodeAlchemist Architecuture
 
-![](..\images\codeAlchemist-1.png)
+![](../images/codeAlchemist-1.png)
 
 输入：seeds、config、JS Engine
 
@@ -149,7 +149,7 @@ path-sensitive 准确率可能会好一些。
 
 ### Code Brick组合
 
-![](..\images\codeAlchemist-2.png)
+![](../images/codeAlchemist-2.png)
 
 接受四个用户配置的参数，本文章只关注前两个参数
 
@@ -189,17 +189,17 @@ path-sensitive 准确率可能会好一些。
 
 #### 参数对于CodeAlchemist 的影响
 
-![](..\images\codeAlchemist-4.png)
+![](../images/codeAlchemist-4.png)
 
 - 与前沿 fuzzer 对比的效果，在漏洞挖掘方面
 
-  ![](..\images\codeAlchemist-5.png)
+  ![](../images/codeAlchemist-5.png)
 
 #### 是否可以在最新的 JS 引擎中发现真实漏洞
 
 
 
-![](..\images\codeAlchemist-6.png)
+![](../images/codeAlchemist-6.png)
 
 发现19个bugs,其中11个未知，已报厂商并获得3个 CVE
 
