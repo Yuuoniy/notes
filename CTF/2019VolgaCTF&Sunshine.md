@@ -1,7 +1,5 @@
 # 2019VolgaCTF & 2019SunshineCTF writeup
 
-用户名：snow
-
 ## VolgaCTF:
 
 - warm/Shadow Cat/JOI
