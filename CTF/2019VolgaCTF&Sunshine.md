@@ -223,6 +223,8 @@ flag: `sun{ju57_4n07h3r_5ql1_ch4ll}`
 
 ~~根据题意，想到的 chain 就是 "old_school "->"old_school "->"last_ride  “，第一次写入 “/bin/sh" 得到第一个地址，第二次写入第一次的地址，第三次把第二次的传给"last_ride  “，从而构造 system(”/bin/sh")~~ 
 
+(只用 mmap 一次然后传值就好了)
+
 实际操作还是很多问题的，注意退出"old_school "的时候不要选 “n"，其他随便字符都可以，"old_school "有\x00截断，第一次返回的地址有前导'\x00'，可以对地址进行 +x 的操作，其次 "last_ride  “ 中会多拷贝地址后的 "00" 导致执行 system 执行时不能访问对应的内存。把产生的地址传给它，成功 getshell . 注意 \x00 可能会导致传址失败，导致 buffer 里面还是  bin/sh 
 
 ```python
