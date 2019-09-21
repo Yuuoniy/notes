@@ -13,17 +13,15 @@ edit :存在 off-by-one 漏洞
 利用思路
 
 - 利用 Off-by-one 漏洞覆盖下一个 chunk 的 size 字段
-- 申请伪造的chunk大小，造成 overlapping, 修改 fd/bk指针
+- 申请伪造的chunk大小，造成 overlapping, 修改关键指针
 
 要注意因为 chunk0 大小是 0x18，会用到 chunk1 的 pre_size 部分。
 
-然后溢出的时候刚好可以覆盖到 chunk1 的 size 部分。
+然后溢出的时候刚好可以覆盖到 nextchunk 的 size 部分。
 
 然后堆布局基本是这样的：
 
 chunk1 info(0x20) | chunk1 | chunk2 info | chunk2
-
-
 
 所以我们 chunk1 溢出修改的是 chunk2 info 的 size, 然后这个 chunk 就会覆盖到 chunk2 的信息，
 
@@ -49,9 +47,9 @@ gef➤  x/16gx 0xb3c010-0x10
 
 然后我们再 malloc 一个 0x30 的 chunk。
 
-这时候会 malloc 一个 0x20 的 info chunk，然后malloc 一个 0x40 的实际 chunk.
+这时候会 malloc 一个 0x20 的 info chunk，然后malloc 一个 0x40 的实际 chunk. 
 
-自己画下图就明白了，最后我们可以修改 info chunk 中指向对应 chunk 的指针，这样show的时候就可以泄露地址了，再改写 free 的 got 表为 system， 最后成功 getshell。
+自己画下图就明白内存的关系, 0x40 的 chunkA 包含了 0x20 的 info chunkB, 这样我们写 chunkA 时，就可以构造 chunkB 的数据，也就是 size 和 Ptr 的数据。这里我们将 ptr 改成了 free 函数的 got 地址。size 是 0x30 不变的。这样show的时候就可以泄露地址了，再改写 free 的 got 表为 system， 最后成功 getshell。
 
 
 
@@ -126,7 +124,6 @@ edit(1, p64(system_addr))
 
 # trigger system("/bin/sh")
 delete(0)
-
 r.interactive()
 
 ```
